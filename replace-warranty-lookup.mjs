@@ -4,7 +4,7 @@ const path = new URL("./assets/index-BIbDezYe.js", import.meta.url);
 let code = fs.readFileSync(path, "utf8");
 
 const helperPattern = /function \$w\([^)]*\)\{.*?\};Zl\.createRoot/;
-const helper = `function $w(e,t,n,r,i){const l=window.__MRC_WARRANTY_LOOKUP__;return typeof l==="function"?l({make:e,year:t,model:n,fuelType:r,trim:i}):{status:"unverified",basic:"Not verified",powertrain:"Not verified",powertrainLabel:"Powertrain / EV System",note:"Warranty database did not load."}};Zl.createRoot`;
+const helper = `function $w(e,t,n,r,i){const l=window.__MRC_WARRANTY_LOOKUP__;return typeof l==="function"?l({make:e,year:t,model:n,fuelType:r,trim:i}):{status:"unverified",basic:"Not verified",powertrain:"Not verified",powertrainLabel:"Powertrain / EV System",note:"Warranty database did not load.",secondOwner:"Subsequent-owner terms unavailable.",secondOwnerSourceUrl:null}};Zl.createRoot`;
 
 if (!helperPattern.test(code)) throw new Error("Could not locate the existing warranty helper.");
 code = code.replace(helperPattern, helper);

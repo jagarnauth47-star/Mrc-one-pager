@@ -10,6 +10,7 @@ coverage.
 - U.S.-market passenger cars, SUVs, minivans, and consumer light-duty pickups
 - Basic/bumper-to-bumper and powertrain coverage
 - EV battery/drive-unit coverage where a conventional powertrain term does not apply
+- Subsequent-owner transfer treatment and manufacturer-specific exceptions
 
 ## Accuracy rules
 
@@ -17,7 +18,8 @@ coverage.
 2. Model- or trim-specific terms take precedence over a make-wide rule.
 3. When the VIN decoder does not expose a configuration that changes warranty mileage, the result says configuration verification is required.
 4. When no audited rule matches, the result says `Not verified`; the app does not estimate or silently use a current-model warranty.
-5. Terms are original factory terms, not a representation of remaining coverage, transferability, eligibility, exclusions, or in-service date.
+5. Terms describe the original warranty and published transfer rules, not a determination of remaining coverage, eligibility, title history, exclusions, or the vehicle's in-service date.
+6. Subsequent-owner notes link to an official manufacturer warranty page and never imply that coverage restarts on the used-vehicle purchase date.
 
 ## Maintenance
 

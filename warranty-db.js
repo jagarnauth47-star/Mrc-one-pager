@@ -2,7 +2,7 @@
   "use strict";
 
   const CURRENT_MODEL_YEAR = 2027;
-  const VERIFIED_ON = "2026-09-17";
+  const VERIFIED_ON = "2026-11-17";
 
   const sources = {
     honda: { title: "Honda warranty booklets", url: "https://owners.honda.com/vehicle-information/warranty" },
@@ -137,6 +137,86 @@
     return `${years} / ${miles}`;
   };
 
+  const ownershipPolicies = {
+    HYUNDAI: {
+      status: "reduced",
+      text: "The 10-year/100,000-mile powertrain warranty is original-owner-only. A subsequent owner generally receives powertrain coverage only through the remaining 5-year/60,000-mile New Vehicle Limited Warranty.",
+      url: "https://www.hyundaiusa.com/us/en/assurance/america-best-warranty"
+    },
+    KIA: {
+      status: "reduced",
+      text: "The 10-year/100,000-mile powertrain warranty generally applies to the original purchaser or a qualifying Kia Certified Pre-Owned purchaser. Other remaining factory coverage is transferable; a non-CPO subsequent owner generally relies on the remaining 5-year/60,000-mile coverage.",
+      url: "https://www.kia.com/us/en/warranty"
+    },
+    GENESIS: {
+      status: "reduced",
+      text: "The 10-year/100,000-mile powertrain warranty is generally not transferable. Subsequent owners have powertrain components covered through the remaining 5-year/60,000-mile New Vehicle Limited Warranty; limited spouse and lease-buyout exceptions may apply.",
+      url: "https://www.genesis.com/us/en/ownership/warranty"
+    },
+    MITSUBISHI: {
+      status: "reduced",
+      text: "The 10-year/100,000-mile powertrain warranty applies to the original owner. A subsequent owner receives the balance of the transferable 5-year/60,000-mile New Vehicle Limited Warranty.",
+      url: "https://www.mitsubishicars.com/what-drives-us/warranty"
+    },
+    NISSAN: {
+      status: "special",
+      text: "The remaining warranty is generally transferable, but Nissan lists restrictions involving transfer during the first six months and registration outside the United States. Confirm the vehicle's warranty region and transfer history.",
+      url: "https://www.nissanusa.com/owners/warranty-and-protection.html"
+    },
+    TESLA: {
+      status: "transferable",
+      text: "The warranty follows the vehicle after the ownership transfer is completed through Tesla. Salvage, rebuilt, total-loss or Tesla 'unsupported vehicle' status can affect warranty and service support.",
+      url: "https://www.tesla.com/support/vehicle-warranty"
+    },
+    RIVIAN: {
+      status: "special",
+      text: "Warranty coverage may transfer to a lawful subsequent purchaser. Rivian advises contacting it before purchase to determine whether any coverage has already been voided.",
+      url: "https://rivian.com/support/article/what-is-the-new-vehicle-limited-warranty"
+    },
+    LUCID: {
+      status: "special",
+      text: "Remaining coverage can transfer after proof of ownership. Branded-title or total-loss status and certain commercial uses can void coverage; review Lucid's complete terms.",
+      url: "https://lucidmotors.com/knowledge/ownership/maintenance-and-warranty/lucid-limited-warranty"
+    },
+    TOYOTA: {
+      status: "transferable",
+      text: "The remaining New Vehicle Limited Warranty transfers automatically at no cost. The warranty clock continues from the original in-service date.",
+      url: "https://support.toyota.com/s/article/Is-the-New-Vehicle-Li-7769"
+    },
+    SCION: {
+      status: "transferable",
+      text: "Remaining Toyota/Scion factory coverage follows the vehicle; time and mileage continue from the original in-service date.",
+      url: "https://www.toyota.com/owners/warranty-owners-manuals/"
+    },
+    MAZDA: {
+      status: "transferable",
+      text: "The remaining New Vehicle and Powertrain Limited Warranties are transferable to subsequent owners during the warranty period.",
+      url: "https://www.mazdausa.com/owners/warranty"
+    }
+  };
+
+  function ownershipPolicy(make, model, trim, year, source) {
+    if (make === "CHEVROLET" && model === "CORVETTE" && year >= 2023 && (trim.includes("Z06") || trim.includes("E RAY"))) {
+      return {
+        status: "special",
+        text: "Certain Corvette Z06/E-Ray model years have a six-month ownership-retention rule. An early transfer can void bumper-to-bumper, powertrain and other listed factory coverages; verify the exact model-year booklet.",
+        url: "https://www.chevrolet.com/owners/warranty"
+      };
+    }
+    if (make === "GMC" && model.includes("HUMMER EV") && year >= 2023 && year <= 2024) {
+      return {
+        status: "special",
+        text: "Certain 2023–2024 HUMMER EV Edition 1 vehicles have a six-month retention rule. An early transfer can void bumper-to-bumper, EV propulsion and other listed coverage.",
+        url: "https://www.gmc.com/warranty-protection"
+      };
+    }
+    return ownershipPolicies[make] || {
+      status: "verify",
+      text: "Remaining factory coverage generally follows the vehicle, but it does not restart for a used buyer. Confirm transferability, original in-service date, title history, commercial use and other exclusions in the official warranty terms.",
+      url: source ? source.url : null
+    };
+  }
+
   function lookup(input) {
     const make = normalize(input && input.make);
     const model = normalize(input && input.model);
@@ -165,11 +245,15 @@
         status: "unverified",
         basic: "Not verified",
         powertrain: "Not verified",
-        note: "No audited factory-warranty record is available for this exact model-year combination."
+        note: "No audited factory-warranty record is available for this exact model-year combination.",
+        secondOwner: "Subsequent-owner terms are not verified for this exact model-year combination.",
+        secondOwnerStatus: "unverified",
+        secondOwnerSourceUrl: null
       };
     }
 
     const source = sources[selected.sourceId];
+    const ownership = ownershipPolicy(make, model, trim, year, source);
     const evText = formatCoverage(selected.evBattery);
     return {
       status: "verified",
@@ -181,12 +265,15 @@
       note: selected.note || "Original U.S. new-vehicle limited warranty terms.",
       source: source ? source.title : "OEM warranty documentation",
       sourceUrl: source ? source.url : null,
+      secondOwner: ownership.text,
+      secondOwnerStatus: ownership.status,
+      secondOwnerSourceUrl: ownership.url || (source ? source.url : null),
       verifiedOn: selected.verifiedOn
     };
   }
 
   window.__MRC_WARRANTY_DB__ = Object.freeze({
-    version: "2026.09.17-audit-2",
+    version: "2026.11.17-audit-3",
     region: "United States",
     modelYearStart: 2012,
     modelYearEnd: CURRENT_MODEL_YEAR,

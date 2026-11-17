@@ -43,7 +43,15 @@ for (const [vehicle, basic, powertrain] of expected) {
   assert.equal(result.basic, basic, JSON.stringify(vehicle));
   assert.equal(result.powertrain, powertrain, JSON.stringify(vehicle));
   assert(result.sourceUrl && result.verifiedOn, `Missing traceability: ${JSON.stringify(vehicle)}`);
+  assert(result.secondOwner && result.secondOwnerSourceUrl, `Missing subsequent-owner terms: ${JSON.stringify(vehicle)}`);
 }
+
+assert.match(lookup({ year: 2024, make: "Hyundai", model: "Tucson" }).secondOwner, /5-year\/60,000-mile/);
+assert.match(lookup({ year: 2024, make: "Kia", model: "Telluride" }).secondOwner, /Certified Pre-Owned/);
+assert.equal(lookup({ year: 2024, make: "Toyota", model: "Camry" }).secondOwnerStatus, "transferable");
+assert.equal(lookup({ year: 2023, make: "Chevrolet", model: "Corvette", trim: "Z06" }).secondOwnerStatus, "special");
+assert.equal(lookup({ year: 2024, make: "GMC", model: "Hummer EV SUV", trim: "Edition 1" }).secondOwnerStatus, "special");
+assert.equal(lookup({ year: 2024, make: "Tesla", model: "Model 3", trim: "Long Range" }).secondOwnerStatus, "transferable");
 
 assert.equal(lookup({ year: 2011, make: "Honda", model: "Accord" }).status, "unverified");
 assert.equal(lookup({ year: 2025, make: "Unknown Motors", model: "Example" }).status, "unverified");
